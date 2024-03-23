@@ -1,4 +1,5 @@
 <?php
+
 ini_set('display_errors', 0);
 ini_set('display_startup_errors', 0);
 error_reporting(0);
@@ -14,6 +15,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'GET') {
 }
 
 $errors = FALSE;
+
 if (empty($_POST['name'])) {
     print('Укажите ФИО.<br/>');
     $errors = TRUE;
@@ -35,9 +37,12 @@ if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL
     $errors = TRUE;
 }
 
-if (empty($_POST['date'])) {
-    print('Укажите день рождения.<br/>');
-    $errors = TRUE;
+$date_format = 'd.m.Y';
+$date_timestamp = strtotime($_POST['date']);
+$date_valid = date($date_format, $date_timestamp) === $_POST['date'];
+if (empty($_POST['date']) || $date_valid){
+  print('Дата некорректна<br/>');
+  $errors = TRUE;
 }
 
 if (empty($_POST['gender']) ) {
@@ -61,25 +66,21 @@ if (empty($_POST['Languages'])) {
     $errors = TRUE;
 }
 
-$selectedLanguages = array(
-    'Pascal', 'C', 'Cplusplus', 'JavaScript', 'PHP',
-    'Python', 'Java', 'Haskel', 'Clojure', 'Prolog', 'Scala'
-);
-$languageValues = array();
-foreach ($selectedLanguages as $language) {
-    $languageValues[] = in_array($language, $_POST['Languages']) ? '1' : '0';
-}
-
 if (empty($_POST['biography'])) {
     print('Напишите кратко биографию.<br/>');
     $errors = TRUE;
 }
+$biography = $_POST['biography'];
+if (!preg_match('/^[a-zA-Zа-яА-Яе0-9,.!? ]+$/', $biography)) {
+    print('Биография содержит недопустимые символы.<br/>');
+    $errors = TRUE;
+}
 
+$agree = 'agree';
 if (empty($_POST['agree'])) {
     print('Вы не согласились с условиями контракта!<br/>');
     $errors = TRUE;
 }
-$agree = 'agree';
 
 if ($errors) {
     exit();
@@ -87,14 +88,34 @@ if ($errors) {
 
 $user = 'u67313';
 $pass = '4344635';
-$db = new PDO('mysql:host=localhost;dbname=u67313', $user, $pass, array(PDO::ATTR_PERSISTENT => true));
+$db = new PDO('mysql:host=localhost;dbname=u67313', $user, $pass, array(PDO::MYSQL_ATTR_INIT_COMMAND => "SET NAMES utf8"));
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+foreach ($_POST['languages'] as $language) {
+    $stmt = $db->prepare("SELECT id FROM languages WHERE id= :id");
+    $stmt->bindParam(':id', $language);
+    $stmt->execute();
+    if ($stmt->rowCount() == 0) {
+      print('Ошибка при добавлении языка.<br/>');
+      exit();
+    }
+}
 
 try {
-    $stmt = $db->prepare("INSERT INTO application SET name = ?, phone = ?, email = ?, date = ?, gender = ?, 
-        Pascal = ?, C = ?, Cplusplus = ?, JavaScript = ?, PHP = ?, Python = ?, Java = ?, Haskel = ?, Clojure = ?, Prolog = ?, Scala = ?,
-        biography = ?, agree = ?");
-    $stmt -> execute(array($_POST['name'],$_POST['phone'],$_POST['email'],$_POST['date'],$gender,$languageValues,$_POST['biography'], $agree));
+    $stmt = $db->prepare("INSERT INTO application (names,phones,email,dates,gender,biography)" . "VALUES (:name,:phone,:email,:date,:gender,:biography)");
+    $stmt->execute(array('name' => $name, 'phone' => $phone, 'email' => $email, 'date' => $date, 'gender' => $gender, 'biography' => $biography));
+    $applicationId = $db->lastInsertId();
+   
+    foreach ($_POST['languages'] as $language) {
+      $stmt = $db->prepare("INSERT INTO application_languages (id_lang, id_app) VALUES (:languageId, :applicationId)");
+      $stmt->bindParam(':languageId', $language);
+      $stmt->bindParam(':applicationId', $applicationId);
+      $stmt->execute();
+  };
+  
+    print('Спасибо, результаты сохранены.<br/>'); 
 }
+
 catch(PDOException $e){
     print('Error : ' . $e->getMessage());
     exit();

@@ -13,7 +13,7 @@
 
 <body>
     <div class="fon1 tab mt-4 mb-4 shadow rounded" id="quf">
-        <form method="POST" class="row mx-5 my-2 gy-1">
+        <form action="index.php" method="POST" class="row mx-5 my-2 gy-1">
             <div class="form_item form-group">
                 <label for="formName" style="color: black;">ФИО:</label>
                 <input type="text" class="form_input _req form-control w-50 shadow bg-white rounded" name="name"
@@ -51,8 +51,8 @@
             </div>
 
             <div class="form_item form-group">
-                <label for="multipleSuper" style="color: black;">Любимый язык программирования:</label>
-                    <select multiple class="form_input _req form-control w-50 shadow bg-white rounded" id="multipleSuper" name="Languages[]">
+                <label for="multipleLanguages" style="color: black;">Любимый язык программирования:</label>
+                    <select multiple class="form_input _req form-control w-50 shadow bg-white rounded" id="multipleLanguages" name="Languages[]">
                         <option value="Pascal">Pascal</option>
                         <option value="C">C</option>
                         <option value="Cplusplus">C++</option>
@@ -85,6 +85,7 @@
             </div>
         </form>
     </div>
+
     <div class="fon1 tab mt-4 mb-4 shadow rounded">
         <img src="img/1.png" alt="Image 1">
         <br>
