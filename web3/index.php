@@ -5,7 +5,6 @@ ini_set('display_startup_errors', 0);
 error_reporting(0);
 header('Content-Type: text/html; charset=UTF-8');
 
-
 if ($_SERVER['REQUEST_METHOD'] == 'GET') {
     if (!empty($_GET['save'])) {
         print('Спасибо, форма сохранена.');
@@ -42,13 +41,12 @@ if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL
     $email = $_POST['email'];
 }
 
-
 $date_input = $_POST['date'];
 $date_format = 'Y-m-d';
 
 $date_valid = DateTime::createFromFormat($date_format, $date_input);
 if (!$date_valid) {
-    print('Неверно указана дата рождения..<br/>');
+    print('Неверно указана дата рождения.<br/>');
     $errors = TRUE;
 } else {
     $date = $date_input; 
@@ -64,7 +62,7 @@ switch($_POST['gender']) {
         $gender='m';
         break;
     }
-    case 'f':{
+    case 'f': {
         $gender='f';
         break;
     }
