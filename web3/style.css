@@ -44,6 +44,12 @@ img {
     padding-bottom: 20px;
 }
 
+.thank-you-message {
+    text-align: center;
+    font-size: 20px;
+    color: green;
+}
+
 @media (min-width: 767px) {
     body {
         font-size: 16px;

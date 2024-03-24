@@ -38,14 +38,20 @@ if (empty($_POST['phone']) || !preg_match('/^\+?\d{1,15}$/', $_POST['phone'])) {
 if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     print('Укажите корректный адрес электронной почты.<br/>');
     $errors = TRUE;
+} else {
+    $email = $_POST['email'];
 }
 
-$date_format = 'd.m.Y';
-$date_timestamp = strtotime($_POST['date']);
-$date_valid = date($date_format, $date_timestamp) === $_POST['date'];
-if (empty($_POST['date']) || $date_valid){
-  print('Дата некорректна<br/>');
-  $errors = TRUE;
+
+$date_input = $_POST['date'];
+$date_format = 'Y-m-d';
+
+$date_valid = DateTime::createFromFormat($date_format, $date_input);
+if (!$date_valid) {
+    print('Неверно указана дата рождения..<br/>');
+    $errors = TRUE;
+} else {
+    $date = $date_input; 
 }
 
 if (empty($_POST['gender']) ) {
@@ -69,7 +75,7 @@ if (empty($_POST['Languages'])) {
     $errors = TRUE;
 }
 
-$availableLanguages = array('Pascal', 'C', 'Cplusplus', 'JavaScript', 'PHP', 'Python', 'Java', 'Haskel', 'Clojure', 'Prolog', 'Scala');
+$availableLanguages = array('Pascal', 'C', 'C_plus_plus', 'JavaScript', 'PHP', 'Python', 'Java', 'Haskel', 'Clojure', 'Prolog', 'Scala');
 
 foreach ($_POST['Languages'] as $language) {
     if (!in_array($language, $availableLanguages)) {
@@ -120,13 +126,28 @@ try {
     $applicationId = $db->lastInsertId();
    
     foreach ($_POST['languages'] as $language) {
-      $stmt = $db->prepare("INSERT INTO application_languages (id_lang, id_app) VALUES (:languageId, :applicationId)");
-      $stmt->bindParam(':languageId', $language);
-      $stmt->bindParam(':applicationId', $applicationId);
-      $stmt->execute();
-  };
+        $stmt = $db->prepare("SELECT id FROM languages WHERE title = :title");
+        $stmt->bindParam(':title', $language);
+        $stmt->execute();
+        $languageRow = $stmt->fetch(PDO::FETCH_ASSOC);
+    
+        if ($languageRow) {
+            $languageId = $languageRow['id'];
+    
+            $stmt = $db->prepare("INSERT INTO application_languages (id_lang, id_app) VALUES (:languageId, :applicationId)");
+            $stmt->bindParam(':languageId', $languageId);
+            $stmt->bindParam(':applicationId', $applicationId);
+            $stmt->execute();
+        } else {
+            print('Ошибка: Не удалось найти ID для языка программирования: ' . $language . '<br/>');
+            exit();
+        }
+    }
+       
   
-    print('Спасибо, результаты сохранены.<br/>'); 
+    print('<p class="thank-you-message">');
+    print('Спасибо, форма сохранена.');
+    print('</p>');
 }
 
 catch(PDOException $e){
