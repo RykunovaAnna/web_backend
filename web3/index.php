@@ -30,7 +30,10 @@ if (empty($_POST['name'])) {
 if (empty($_POST['phone']) || !preg_match('/^\+?\d{1,15}$/', $_POST['phone'])) {
     print('Укажите корректный телефонный номер.<br/>');
     $errors = TRUE;
+} else {
+    $phone = $_POST['phone'];
 }
+
 
 if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     print('Укажите корректный адрес электронной почты.<br/>');
@@ -64,6 +67,16 @@ switch($_POST['gender']) {
 if (empty($_POST['Languages'])) {
     print('Укажите хотя бы один язык программирования.<br/>');
     $errors = TRUE;
+}
+
+$availableLanguages = array('Pascal', 'C', 'Cplusplus', 'JavaScript', 'PHP', 'Python', 'Java', 'Haskel', 'Clojure', 'Prolog', 'Scala');
+
+foreach ($_POST['Languages'] as $language) {
+    if (!in_array($language, $availableLanguages)) {
+        print('Выбран недопустимый язык программирования: ' . htmlspecialchars($language) . '.<br/>');
+        $errors = TRUE;
+        break;
+    }
 }
 
 if (empty($_POST['biography'])) {
