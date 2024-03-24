@@ -16,7 +16,7 @@ CREATE TABLE languages (
 );
 
 CREATE TABLE application_languages (
-  id int(100) unsigned NOT NULL AUTO_INCREMENT,
+  id int(10) unsigned NOT NULL AUTO_INCREMENT,
   id_lang int(10) unsigned NOT NULL,
   id_app int(10) unsigned NOT NULL,
   PRIMARY KEY (id),

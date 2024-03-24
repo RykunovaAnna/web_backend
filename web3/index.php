@@ -125,7 +125,7 @@ try {
     $stmt->execute(array('name' => $name, 'phone' => $phone, 'email' => $email, 'date' => $date, 'gender' => $gender, 'biography' => $biography));
     $applicationId = $db->lastInsertId();
    
-    foreach ($_POST['languages'] as $language) {
+    foreach ($_POST['Languages'] as $language) {
         $stmt = $db->prepare("SELECT id FROM languages WHERE title = :title");
         $stmt->bindParam(':title', $language);
         $stmt->execute();
@@ -143,11 +143,8 @@ try {
             exit();
         }
     }
-       
-  
-    print('<p class="thank-you-message">');
+        
     print('Спасибо, форма сохранена.');
-    print('</p>');
 }
 
 catch(PDOException $e){
