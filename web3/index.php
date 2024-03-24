@@ -33,7 +33,6 @@ if (empty($_POST['phone']) || !preg_match('/^\+?\d{1,15}$/', $_POST['phone'])) {
     $phone = $_POST['phone'];
 }
 
-
 if (empty($_POST['email']) || !filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
     print('Укажите корректный адрес электронной почты.<br/>');
     $errors = TRUE;
